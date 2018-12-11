@@ -15,6 +15,23 @@ MainComponent::MainComponent()
     // you add any child components.
     setSize (800, 600);
 
+	coeff_Peak_A[0] = 1;
+	coeff_Peak_A[1] = -1.69065929318241;
+	coeff_Peak_B[2] = 0.73248077421585;
+
+	coeff_Peak_B[0] = 1.53512485958697;
+	coeff_Peak_B[1] = -2.69169618940638;
+	coeff_Peak_B[2] = 1.19839281085285;
+
+	//Coeficientes segunda etapa del filtro realce en frecuencias altas)
+
+	coeff_Altos_A[0] = 1;
+	coeff_Altos_A[1] = -1.99004745483398;
+	coeff_Altos_A[2] = 0.99007225036621;
+
+	coeff_Altos_B[0] = 1;
+	coeff_Altos_B[1] = -2;
+	coeff_Altos_B[2] = 1;
     // specify the number of input and output channels that we want to open
     setAudioChannels (2, 2);
 }
@@ -26,26 +43,52 @@ MainComponent::~MainComponent()
 }
 
 //==============================================================================
-void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
+void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
-    // This function will be called when the audio device is started, or when
-    // its settings (i.e. sample rate, block size, etc) are changed.
+	float dlyTime = 0.4;
+	float dlySamples = dlyTime * sampleRate;
 
-    // You can use this function to initialise any resources you might need,
-    // but be careful - it will be called on the audio thread, not the GUI thread.
+	circularBuffer.reset(new float[dlySamples]);
+	memset(circularBuffer.get(), 0, sizeof(float) * dlySamples);
 
-    // For more details, see the help for AudioProcessor::prepareToPlay()
+	memset(&inputSamples, 0, sizeof(float) * 3);
+	memset(&outputSamples, 0, sizeof(float) * 3);
+
 }
 
 void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
-{
-    // Your audio-processing code goes here!
+{	
+	int totalChannels = bufferToFill.buffer->getNumChannels();
 
-    // For more details, see the help for AudioProcessor::getNextAudioBlock()
+	ScopedPointer <AudioBuffer<float>> nBuffer(bufferToFill.buffer);
 
-    // Right now we are not producing any data, in which case we need to clear the buffer
-    // (to prevent the output of random noise)
-    bufferToFill.clearActiveBufferRegion();
+	
+	if (totalChannels == 1)
+	{
+		float* channelM = nBuffer->getWritePointer(0);
+		
+		for (auto i = 0; i < nBuffer->getNumSamples(); ++i)
+		{
+			
+		}
+	}
+	else if (totalChannels == 2)
+	{
+		float* channelL = nBuffer->getWritePointer(0);
+		float* channelR = nBuffer->getWritePointer(1);
+		
+		for (auto i = 0; i < nBuffer->getNumSamples(); ++i)
+		{
+			float channelM = ((channelL[i] + channelR[i]) / 2);
+
+
+		}
+	}
+	else
+	{
+		bufferToFill.clearActiveBufferRegion();
+	}
+
 }
 
 void MainComponent::releaseResources()

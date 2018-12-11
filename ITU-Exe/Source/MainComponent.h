@@ -34,7 +34,16 @@ public:
 private:
     //==============================================================================
     // Your private member variables go here...
+	std::unique_ptr<float> circularBuffer;
+	
+	float coeff_Peak_A[3];
+	float coeff_Peak_B[3];
+	
+	float coeff_Altos_A[3];
+	float coeff_Altos_B[3];
 
+	float inputSamples[3];
+	float outputSamples[3];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
